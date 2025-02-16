@@ -1,0 +1,49 @@
+
+
+
+class users(
+	attributes:
+		user_id : INT PRIMARY KEY,
+		email: VARCHAR(63),
+		password: VARCHAR(127)
+	method:
+		creat_profile() --> for create new profile
+		get_profiles() --> fetch all profiles 
+)
+
+class profiles(
+	attributes:
+		profile_id : INT PRIMARY KEY,
+		user_id: ForeignKey(user.user_id),
+		name: VARCHAR(63),
+		type: CHAR(5)
+)
+class actors(
+	attributes:
+		actor_id: INT PRIMARY KEY
+		name: VARCHAR(63)
+	method: 
+		fetchVideos() -> list of videos
+)
+class videos(
+	attributes:
+		video_id: INT PRIMARY KEY,
+		title: VARCHAR(50),
+		description: TEXT()
+	method: 
+		getActors() -> return all actors this vedoe
+)
+class videos_casts(
+	video_id -> FK of videos,
+	actor_id -> FK of actors
+)
+class watched_profile(
+	profile_id -> FK profiles,
+	video_id  -> FK videos ,
+	status -> VARCHAR(20),
+	last_watched_time -> timestap
+	method:
+		fetchWatchedVideo()  --> list of video with status
+		fetchInProgressVideo() --> all in-progres video with time stamp
+)
+
