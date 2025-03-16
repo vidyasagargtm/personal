@@ -1,0 +1,139 @@
+a. Record Type
+
+{
+  "type": "record",
+  "name": "LongList",
+  "aliases": ["LinkedLongs"],                      // old name for this
+  "fields" : [
+    {"name": "salary", "type": "long"},             // each element has a long
+    {"name": "full_name", "type": ["null", "String"]} // optional next element
+  ]
+}
+
+b. Enum
+
+{ "type" : "enum",
+  "name" : "Colors",
+  "namespace" : "palette",
+  "doc" : "Colors supported by the palette.",
+  "symbols" : ["WHITE", "BLUE", "GREEN", "RED", "BLACK"]
+}
+
+c. Arrays
+
+{"type": "array","name" : "testarray" ,items": "string"}
+
+d. Map
+
+{"type": "map", "name" : "testmap","values": "long"}   testmap.put("yogesh",123456) testmap.put(1223,123456)
+
+e. Fixed
+
+{"type": "fixed", "size": 16, "name": "fixedarray"}
+
+f. Union
+
+{
+     "type": "record",
+     "namespace": "com.example",
+     "name": "FullName",
+     "fields": [
+       { "name": "firstname", "type": ["string", "null"] },
+       { "name": "lastname", "type": "string", "default" : "Doe" }
+     ]
+} 
+
+
+Sqoop With avro data
+
+sqoop import --connect  jdbc:mysql://10.0.3.12/28oct2017--driver com.mysql.jdbc.Driver --username labuser -P --table EMP --as-avrodatafile --target-dir /user/singh25nov_gmail/avroempdata -m 1
+
+sqoop import --connect  jdbc:mysql://172.31.54.174/sqoop_demo --driver com.mysql.jdbc.Driver --username labuser -P --table EMP --as-parquetfile
+
+sqoop import --connect  jdbc:mysql://172.31.54.174/sqoop_demo --driver com.mysql.jdbc.Driver --username labuser -P --table EMP --hive-import --hive-table emp  --as-parquetfile
+
+sqoop import --connect  jdbc:mysql://172.31.54.174/sqoop_demo --driver com.mysql.jdbc.Driver --username labuser -P --table EMP --hive-import --hive-database 17sep2017 --hive-table emp  --target-dir '/user/singh25nov_gmail//Parquet/' --as-parquetfile
+
+CREATE TABLE avro_data
+ROW FORMAT
+SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
+STORED AS
+INPUTFORMAT 'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat'
+OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat'
+TBLPROPERTIES ('avro.schema.literal'='{
+  "namespace": "testing.hive.avro.serde",
+  "name" : "avro_data",
+  "type": "record",
+  "fields": [
+    {
+      "name":"EMPno",
+      "type":"int"
+    },
+    {
+      "name":"ename",
+      "type":"string"
+    },
+    {
+      "name":"sal",
+      "type":"int"
+    },
+    {
+      "name":"mgr",
+      "type":"string",
+      "default":"1234"
+    }
+  ]
+}');
+
+LOAD DATA  INPATH '/user/singh25nov_gmail//avrotype/part-m-00000.avro' INTO TABLE avro_data;
+
+
+To Enable Snappy compression on output files, run the following before writing to the table:
+SET hive.exec.compress.output=true;
+SET avro.output.codec=snappy;
+
+avro-tools getschema hdfs://cloudera masternode1.cloudlab.com/user/<userid>/twitter/FlumeData.1510413778838 > schema.avsc
+
+
+    CREATE EXTERNAL TABLE avro_hive_table
+    ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
+	TBLPROPERTIES
+    ('avro.schema.url'='/user/singh25nov_gmail/Niwas.avsc')
+    STORED AS INPUTFORMAT
+    'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat'
+    OUTPUTFORMAT 'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat';
+	
+    LOCATION
+    '/user/avro/applog_avro';
+
+
+
+parquet_demo
+
+create table myparquettable (
+driverId INT, 
+name STRING, 
+ssn BIGINT,
+location STRING, 
+certified STRING, 
+wageplan STRING)
+STORED AS PARQUET
+LOCATION '/user/singh25nov_gmail//parquetempdata';
+insert overwrite table myparquettable select * from drivers_oj;	
+
+Avro Read and write
+
+java -jar avro-tools-1.7.4.jar getschema part-m-00000.avro > schema.avsc
+
+CREATE TABLE employee
+  ROW FORMAT SERDE
+  'org.apache.hadoop.hive.serde2.avro.AvroSerDe'
+  STORED AS INPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerInputFormat'
+  OUTPUTFORMAT
+  'org.apache.hadoop.hive.ql.io.avro.AvroContainerOutputFormat'
+  TBLPROPERTIES (
+    'avro.schema.url'='/apps/hive/warehouse/30july2017.db/avro_data/schema.avsc');
+	
+Load the data
+fire select query.
